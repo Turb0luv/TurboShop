@@ -25,14 +25,15 @@ xylinet = info.Info("XYLINET 40MG", '13р', ['🍓🍋Malinovyi Fisting', '🍑�
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    await bot.send_message(message.from_user.id, '👋🏻 Привет! Добро пожаловать в TurboShop.'
-                                                 '\nДля просмотра ассортимента жидкостей - нажми Ассортимент'
-                                                 '\nСамовывоз - ЖД Вокзал Гродно'
-                                                 '\nУдобное время для встречи указывайте в коммнтарии к заказу'
-                                                 '\nПо всем вопросам - @Turb0Luv', reply_markup=kb.markup)
+    await bot.send_message(message.from_user.id, '👋🏻 Привет!' 
+                                                 '\nДобро пожаловать в <b>TurboShop</b>.'
+                                                 '\nВыбор жидкости: жми ниже ⬇️<b>АССОРТИМЕНТ</b>⬇️.'
+                                                 '\nСамовывоз:<b>ЖД Вокзал-Гродно</b>.'
+                                                 '\nУдобное время для встречи указывай в комментарии к заказу.'
+                                                 '\nПо всем вопросам - @Turb0Luv', parse_mode="HTML", reply_markup=kb.markup)
 
 
-@dp.message_handler(Text(equals="Ассортимент"))
+@dp.message_handler(Text(equals="⏩АССОРТИМЕНТ⏪"))
 async def katalog(message: types.Message):
     await bot.send_message(message.from_user.id, "Выбери линейку", reply_markup=kb.assort_buttons)
 
@@ -80,17 +81,32 @@ l = ''
 async def botShop(call: types.CallbackQuery):
     await bot.delete_message(call.from_user.id, call.message.message_id)
     global l
-    l = rename.info + "\n" + call.data + "\n@" + call.from_user.username
-    await bot.send_message(call.from_user.id, "Напиши предпочтительное время")
+    l = rename.info + "\n" + call.data.replace('liq_', '') + "\nTG: @" + call.from_user.username
+    await bot.send_message(call.from_user.id, "Укажи предпочтительное время и комментарий(если нужен)")
     # await bot.send_message(438102155, husky.info + "\n" + husky.inline_btn_1.text + "\n@" + call.from_user.username)
 
 
 @dp.message_handler(content_types=["text"])
 async def read(message):
     if len(l) != 0:
+        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + message.text + '\nПОДТВЕРЖДАЕМ?', reply_markup=kb.last_buttons)
+
+@dp.callback_query_handler(text_contains="pac_yes")
+async def read(message):
+    if len(l) != 0:
+        await bot.delete_message(message.from_user.id, message.message.message_id)
+        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + message.text)
+        await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!", reply_markup=kb.markup)
         await bot.send_message(438102155, l + "\n" + message.text)
-        await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!")
         gh()
+
+@dp.callback_query_handler(text_contains="pac_no")
+async def read(message):
+    if len(l) != 0:
+        await bot.send_message(message.from_user.id, "Возврат в меню", reply_markup=kb.assort_buttons)
+        await bot.delete_message(message.from_user.id, message.message.message_id)
+        gh()
+
 
 
 def gh():

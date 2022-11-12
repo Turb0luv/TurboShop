@@ -21,3 +21,4 @@ class Info:
                                                      InlineKeyboardButton(self.other[6], callback_data='liq_'+self.other[6]),
                                                      InlineKeyboardButton(self.other[7], callback_data='liq_'+self.other[7]),
                                                      )
+

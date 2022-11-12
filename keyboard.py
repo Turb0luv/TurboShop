@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, \
-    KeyboardButton
+    KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-button1 = KeyboardButton("Ассортимент")
+button1 = KeyboardButton("⏩АССОРТИМЕНТ⏪")
 # button3 = KeyboardButton("Мой кабинет👤")
 
 markup = ReplyKeyboardMarkup(resize_keyboard=True).row(button1)  # .add(button3)
@@ -17,3 +17,8 @@ btn_esc = KeyboardButton('◀️НАЗАД')
 
 assort_buttons = ReplyKeyboardMarkup(resize_keyboard=True).row(btn_1, btn_2, btn_3).add(btn_6,
                                                                                         btn_esc)  # .add(btn_4, btn_5, btn_6, btn_7)#.add(btn_esc)
+
+btn_yes = InlineKeyboardButton('✅', callback_data='pac_yes')
+btn_no = InlineKeyboardButton('❌', callback_data='pac_no')
+
+last_buttons = InlineKeyboardMarkup(row_width=1).add(btn_yes, btn_no)
