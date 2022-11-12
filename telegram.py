@@ -4,7 +4,6 @@ from aiogram.dispatcher.filters import Text
 import info
 import keyboard as kb
 
-
 bot = Bot(token="5692590643:AAHB8UY6_wN3vx5ovWtQPn-ecIM2Ow-ZJeI")
 dp = Dispatcher(bot)
 
@@ -12,13 +11,17 @@ husky = info.Info('HUSKY 45MG ОРИГИНАЛ', "13р",
                   ['Сочная Маракуя', 'Жвачка Манго', 'Кислое яблоко', 'Мятная Жвачка', 'Энергетик, киви, фейхова',
                    'Конфета Личи', '', '', ''])
 
-hotspot = info.Info('HOTSPOT 60MG', '13р', ['🍏🍏Кислое Яблоко', '🥝🥝Кислый Киви', '🍇🍇Кислая Маракуйя', '🍍🍍Кислый Ананас', '', '', '', '', ''])
+hotspot = info.Info('HOTSPOT 60MG', '13р',
+                    ['🍏🍏Кислое Яблоко', '🥝🥝Кислый Киви', '🍇🍇Кислая Маракуйя', '🍍🍍Кислый Ананас', '', '', '', '', ''])
 
-genetic = info.Info("GENETIC CODE 50MG", '13р', ['🍓🍈Клубника Дыня', '🍍🍒Ананас Клюква', '🥭🍌Манго Банан', '🍐🍊Маракуйя Кумкват','🍇🥤Виноградная Кола',
-'🥝🍐Шелковица Киви Гуава', '🍉🍓Арбуз Грейпфрут Малина', ''])
+genetic = info.Info("GENETIC CODE 50MG", '13р',
+                    ['🍓🍈Клубника Дыня', '🍍🍒Ананас Клюква', '🥭🍌Манго Банан', '🍐🍊Маракуйя Кумкват', '🍇🥤Виноградная Кола',
+                     '🥝🍐Шелковица Киви Гуава', '🍉🍓Арбуз Грейпфрут Малина', ''])
 
 xylinet = info.Info("XYLINET 40MG", '13р', ['🍓🍋Malinovyi Fisting', '🍑🍍Persikovyi Kuni',
-'🍋🍸Myatnaya Irrymatsiya', '🍐🍋Tropicheski Skvirt', '🍍🍯Ananasovyi Kamshot', '', '', '', ''])
+                                            '🍋🍸Myatnaya Irrymatsiya', '🍐🍋Tropicheski Skvirt', '🍍🍯Ananasovyi Kamshot',
+                                            '', '', '', ''])
+
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
@@ -45,11 +48,13 @@ async def huskyflavor(message: types.Message):
     rename = husky
     await bot.send_message(message.from_user.id, rename.info + "\n\nВыбери вкус:", reply_markup=rename.crbutt())
 
+
 @dp.message_handler(Text(equals="HOTSPOT 60MG"))
 async def hotspotflavor(message: types.Message):
     global rename
     rename = hotspot
     await bot.send_message(message.from_user.id, rename.info + "\n\nВыбери вкус:", reply_markup=rename.crbutt())
+
 
 @dp.message_handler(Text(equals="GENETIC CODE 50MG"))
 async def geneticflavor(message: types.Message):
@@ -57,16 +62,19 @@ async def geneticflavor(message: types.Message):
     rename = genetic
     await bot.send_message(message.from_user.id, rename.info + "\n\nВыбери вкус:", reply_markup=rename.crbutt())
 
+
 @dp.message_handler(Text(equals="XYLINET 40MG"))
 async def xylinetflavor(message: types.Message):
     global rename
     rename = xylinet
     await bot.send_message(message.from_user.id, rename.info + "\n\nВыбери вкус:", reply_markup=rename.crbutt())
 
-#@dp.message_handler(Text(equals="Мой кабинет👤"))
-#async def kabinet(message: types.Message):
- #   await bot.send_message(message.from_user.id, "мой кабинет")
+
+# @dp.message_handler(Text(equals="Мой кабинет👤"))
+# async def kabinet(message: types.Message):
+#   await bot.send_message(message.from_user.id, "мой кабинет")
 l = ''
+
 
 @dp.callback_query_handler(text_contains="liq_")
 async def botShop(call: types.CallbackQuery):
