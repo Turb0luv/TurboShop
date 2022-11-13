@@ -24,7 +24,7 @@ genetic = info.Info("GENETIC CODE 50MG", '13р',
 
 xylinet = info.Info("XYLINET 40MG", '13р', ['🍓🍋Malinovyi Fisting', '🍑🍍Persikovyi Kuni',
                                             '🍋🍸Myatnaya Irrymatsiya', '🍐🍋Tropicheski Skvirt', '🍍🍯Ananasovyi Kamshot',
-                                            '', '', '', ''])
+                                            '🍊🌧Apelsinovyi  Dozhd', '', '', ''])
 
 
 @dp.message_handler(commands=['start'])
@@ -42,7 +42,7 @@ async def start(message: types.Message):
 
 @dp.message_handler(Text(equals="⏩АССОРТИМЕНТ⏪"))
 async def katalog(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выбери линейку", reply_markup=line_markup)
+    await bot.send_message(message.from_user.id, "Выбери линейку", reply_markup=kb.assort_buttons)
 
 
 @dp.message_handler(Text(equals="◀️НАЗАД"))
@@ -86,19 +86,20 @@ async def profile(message: types.Message):
 
 
 l = ''
-
+user = ''
 
 @dp.callback_query_handler(text_contains="liq_")
 async def botShop(call: types.CallbackQuery):
+    global user
     user = User.get(User.id == call.from_user.id)
-    await bot.delete_message(call.from_user.id, call.message.message_id)
+    await bot.delete_message(user.id, call.message.message_id)
     global l
     l = rename.info + "\n" + call.data.replace('liq_', '')
-    if call.from_user.username:
-        l += "\nTG: @" + call.from_user.username
+    if user.username:
+        l += "\nTG: @" + user.username
     else:
-        l += "\n" + call.from_user.url
-    await bot.send_message(call.from_user.id, "Укажи предпочтительное время и комментарий(если нужен)")
+        l += "\n" + user.url
+    await bot.send_message(user.id, "Укажи предпочтительное время и комментарий(если нужен)")
     # await bot.send_message(438102155, husky.info + "\n" + husky.inline_btn_1.text + "\n@" + call.from_user.username)
 
 
@@ -108,11 +109,11 @@ async def botShop(call: types.CallbackQuery):
 
 @dp.message_handler(content_types=["text"])
 async def read(message):
-    user = User.get(User.id == message.from_user.id)
+    global user
     if len(l) != 0:
         global time
         time = message.text
-        await bot.send_message(message.from_user.id,
+        await bot.send_message(user.id,
                                'Ваш заказ:' + '\n' + l + "\nКомментарий:" + time + '\nПОДТВЕРЖДАЕМ?',
                                reply_markup=kb.last_buttons)
 
@@ -122,9 +123,9 @@ async def read(message):
     user = User.get(User.id == message.from_user.id)
     user.count += 1
     if len(l) != 0:
-        await bot.delete_message(message.from_user.id, message.message.message_id)
-        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + time)
-        await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!",
+        await bot.delete_message(user.id, message.message.message_id)
+        await bot.send_message(user.id, 'Ваш заказ:' + '\n' + l + "\n" + time)
+        await bot.send_message(user.id, "В ближайшее время с вами свяжутся. Ожидайте!",
                                reply_markup=kb.markup)
         await bot.send_message(438102155, l + "\n" + time)
         gh()
@@ -132,9 +133,10 @@ async def read(message):
 
 @dp.callback_query_handler(text_contains="pac_no")
 async def read(message):
+    user = User.get(User.id == message.from_user.id)
     if len(l) != 0:
-        await bot.send_message(message.from_user.id, "Возврат в меню", reply_markup=kb.assort_buttons)
-        await bot.delete_message(message.from_user.id, message.message.message_id)
+        await bot.send_message(user.id, "Возврат в меню", reply_markup=kb.assort_buttons)
+        await bot.delete_message(user.id, message.message.message_id)
         gh()
 
 
