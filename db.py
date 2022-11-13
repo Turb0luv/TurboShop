@@ -13,12 +13,19 @@ class User(Model):
         database = db
         order_by = 'id'
 
+class Line(Model):
+    id = PrimaryKeyField(unique=True)
+    name = CharField()
+    price = IntegerField()
 
-class Liquid(Model):
+    class Meta():
+        database = db
+        order_by = 'id'
+
+class Flavor(Model):
     id = PrimaryKeyField(unique=True)
     flavor = CharField()
-    price = IntegerField()
-    line_id = ForeignKeyField(Line, backref='products')
+    line_id = ForeignKeyField(Line, backref='line')
 
     class Meta():
         database = db
@@ -26,4 +33,4 @@ class Liquid(Model):
 
 
 if __name__ == '__main__':
-    db.create_tables([User, Liquid])
+    db.create_tables([User, Line, Flavor])

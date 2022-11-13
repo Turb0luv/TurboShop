@@ -2,6 +2,8 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters import Text
 
 import peewee
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
 import info
 import keyboard as kb
 from db import *
@@ -27,18 +29,20 @@ xylinet = info.Info("XYLINET 40MG", '13р', ['🍓🍋Malinovyi Fisting', '🍑�
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
-    _ = User.get_or_create(id=message.from_user.id, defaults={'username': message.from_user.username, 'count': 0, 'lastbuy': '-'})
-    await bot.send_message(message.from_user.id, '👋🏻 Привет!' 
+    _ = User.get_or_create(id=message.from_user.id,
+                           defaults={'username': message.from_user.username, 'count': 0, 'lastbuy': '-'})
+    await bot.send_message(message.from_user.id, '👋🏻 Привет!'
                                                  '\nДобро пожаловать в <b>TurboShop</b>.'
                                                  '\nВыбор жидкости: жми ниже ⬇️<b>АССОРТИМЕНТ</b>⬇️.'
                                                  '\nСамовывоз:<b>ЖД Вокзал-Гродно</b>.'
                                                  '\nУдобное время для встречи указывай в комментарии к заказу.'
-                                                 '\nПо всем вопросам - @Turb0Luv', parse_mode="HTML", reply_markup=kb.markup)
+                                                 '\nПо всем вопросам - @Turb0Luv', parse_mode="HTML",
+                           reply_markup=kb.markup)
 
 
 @dp.message_handler(Text(equals="⏩АССОРТИМЕНТ⏪"))
 async def katalog(message: types.Message):
-    await bot.send_message(message.from_user.id, "Выбери линейку", reply_markup=kb.assort_buttons)
+    await bot.send_message(message.from_user.id, "Выбери линейку", reply_markup=line_markup)
 
 
 @dp.message_handler(Text(equals="◀️НАЗАД"))
@@ -77,7 +81,9 @@ async def xylinetflavor(message: types.Message):
 @dp.message_handler(Text(equals="МОЙ ПРОФИЛЬ👤"))
 async def profile(message: types.Message):
     user = User.get(User.id == message.from_user.id)
-    await bot.send_message(message.from_user.id, "Профиль:" + '\nИмя: ' + user.username + "\nКол-во заказов: " + str(user.count) + '\nПоследний заказ: ' + user.lastbuy, reply_markup=kb.btn_esc)
+    await bot.send_message(message.from_user.id, "Профиль:" + '\nИмя: ' + user.username + "\nКол-во заказов: " + str(
+        user.count) + '\nПоследний заказ: ' + user.lastbuy, reply_markup=kb.btn_esc)
+
 
 l = ''
 
@@ -95,9 +101,10 @@ async def botShop(call: types.CallbackQuery):
     await bot.send_message(call.from_user.id, "Укажи предпочтительное время и комментарий(если нужен)")
     # await bot.send_message(438102155, husky.info + "\n" + husky.inline_btn_1.text + "\n@" + call.from_user.username)
 
-#@dp.message_handler(Text(equals="РАССЫЛКА"))
-#async def katalog(message: types.Message):
- #   await receiver()
+
+# @dp.message_handler(Text(equals="РАССЫЛКА"))
+# async def katalog(message: types.Message):
+#   await receiver()
 
 @dp.message_handler(content_types=["text"])
 async def read(message):
@@ -105,7 +112,10 @@ async def read(message):
     if len(l) != 0:
         global time
         time = message.text
-        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\nКомментарий:" + time + '\nПОДТВЕРЖДАЕМ?', reply_markup=kb.last_buttons)
+        await bot.send_message(message.from_user.id,
+                               'Ваш заказ:' + '\n' + l + "\nКомментарий:" + time + '\nПОДТВЕРЖДАЕМ?',
+                               reply_markup=kb.last_buttons)
+
 
 @dp.callback_query_handler(text_contains="pac_yes")
 async def read(message):
@@ -114,9 +124,11 @@ async def read(message):
     if len(l) != 0:
         await bot.delete_message(message.from_user.id, message.message.message_id)
         await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + time)
-        await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!", reply_markup=kb.markup)
+        await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!",
+                               reply_markup=kb.markup)
         await bot.send_message(438102155, l + "\n" + time)
         gh()
+
 
 @dp.callback_query_handler(text_contains="pac_no")
 async def read(message):
@@ -125,9 +137,20 @@ async def read(message):
         await bot.delete_message(message.from_user.id, message.message.message_id)
         gh()
 
+
+class LineMarkup(ReplyKeyboardMarkup):
+    def __init__(self):
+        buttons = []
+        for line in Line.select():
+            buttons.append(KeyboardButton(Line.name, callback_data=Line.id))
+        ReplyKeyboardMarkup.add(buttons)
+        self.one_time_keyboard = False
+        self.resize_keyboard = True
+
+
 async def receiver():
     global users
-    for user in users :
+    for user in users:
         await bot.send_message(user, "XYI")
 
 
@@ -137,4 +160,5 @@ def gh():
 
 
 if __name__ == '__main__':
+    line_markup = LineMarkup()
     executor.start_polling(dp, skip_updates=True)
