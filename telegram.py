@@ -1,8 +1,10 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters import Text
 
+import peewee
 import info
 import keyboard as kb
+from db import *
 
 bot = Bot(token="5692590643:AAHB8UY6_wN3vx5ovWtQPn-ecIM2Ow-ZJeI")
 dp = Dispatcher(bot)
@@ -25,6 +27,7 @@ xylinet = info.Info("XYLINET 40MG", '13р', ['🍓🍋Malinovyi Fisting', '🍑�
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
+    _ = User.get_or_create(id=message.from_user.id, defaults={'username': message.from_user.username, 'count': 0, 'lastbuy': '-'})
     await bot.send_message(message.from_user.id, '👋🏻 Привет!' 
                                                  '\nДобро пожаловать в <b>TurboShop</b>.'
                                                  '\nВыбор жидкости: жми ниже ⬇️<b>АССОРТИМЕНТ</b>⬇️.'
@@ -71,33 +74,48 @@ async def xylinetflavor(message: types.Message):
     await bot.send_message(message.from_user.id, rename.info + "\n\nВыбери вкус:", reply_markup=rename.crbutt())
 
 
-# @dp.message_handler(Text(equals="Мой кабинет👤"))
-# async def kabinet(message: types.Message):
-#   await bot.send_message(message.from_user.id, "мой кабинет")
+@dp.message_handler(Text(equals="МОЙ ПРОФИЛЬ👤"))
+async def profile(message: types.Message):
+    user = User.get(User.id == message.from_user.id)
+    await bot.send_message(message.from_user.id, "Профиль:" + '\nИмя: ' + user.username + "\nКол-во заказов: " + str(user.count) + '\nПоследний заказ: ' + user.lastbuy, reply_markup=kb.btn_esc)
+
 l = ''
 
 
 @dp.callback_query_handler(text_contains="liq_")
 async def botShop(call: types.CallbackQuery):
+    user = User.get(User.id == call.from_user.id)
     await bot.delete_message(call.from_user.id, call.message.message_id)
     global l
-    l = rename.info + "\n" + call.data.replace('liq_', '') + "\nTG: @" + call.from_user.username
+    l = rename.info + "\n" + call.data.replace('liq_', '')
+    if call.from_user.username:
+        l += "\nTG: @" + call.from_user.username
+    else:
+        l += "\n" + call.from_user.url
     await bot.send_message(call.from_user.id, "Укажи предпочтительное время и комментарий(если нужен)")
     # await bot.send_message(438102155, husky.info + "\n" + husky.inline_btn_1.text + "\n@" + call.from_user.username)
 
+#@dp.message_handler(Text(equals="РАССЫЛКА"))
+#async def katalog(message: types.Message):
+ #   await receiver()
 
 @dp.message_handler(content_types=["text"])
 async def read(message):
+    user = User.get(User.id == message.from_user.id)
     if len(l) != 0:
-        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + message.text + '\nПОДТВЕРЖДАЕМ?', reply_markup=kb.last_buttons)
+        global time
+        time = message.text
+        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\nКомментарий:" + time + '\nПОДТВЕРЖДАЕМ?', reply_markup=kb.last_buttons)
 
 @dp.callback_query_handler(text_contains="pac_yes")
 async def read(message):
+    user = User.get(User.id == message.from_user.id)
+    user.count += 1
     if len(l) != 0:
         await bot.delete_message(message.from_user.id, message.message.message_id)
-        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + message.text)
+        await bot.send_message(message.from_user.id, 'Ваш заказ:' + '\n' + l + "\n" + time)
         await bot.send_message(message.from_user.id, "В ближайшее время с вами свяжутся. Ожидайте!", reply_markup=kb.markup)
-        await bot.send_message(438102155, l + "\n" + message.text)
+        await bot.send_message(438102155, l + "\n" + time)
         gh()
 
 @dp.callback_query_handler(text_contains="pac_no")
@@ -107,6 +125,10 @@ async def read(message):
         await bot.delete_message(message.from_user.id, message.message.message_id)
         gh()
 
+async def receiver():
+    global users
+    for user in users :
+        await bot.send_message(user, "XYI")
 
 
 def gh():

@@ -2,9 +2,9 @@ from aiogram.types import ReplyKeyboardMarkup, \
     KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
 button1 = KeyboardButton("⏩АССОРТИМЕНТ⏪")
-# button3 = KeyboardButton("Мой кабинет👤")
+button2 = KeyboardButton("МОЙ ПРОФИЛЬ👤")
 
-markup = ReplyKeyboardMarkup(resize_keyboard=True).row(button1)  # .add(button3)
+markup = ReplyKeyboardMarkup(resize_keyboard=True).row(button1).add(button2)
 
 btn_1 = KeyboardButton('HUSKY 45MG', callback_data='liq_button1')
 btn_2 = KeyboardButton('HOTSPOT 60MG', callback_data='liq_button2')
