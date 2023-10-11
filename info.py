@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 class Info:
     other = []
-    buttons = []
+    buttons = [1,2,3]
 
     def __init__(self, name, price, other):
         self.info = name + " \nЦЕНА:" + price
