@@ -2,7 +2,7 @@
 
 class Test2:
     def __init__(self):
-        pass
+        x = 1
 
 
 class Test3:
